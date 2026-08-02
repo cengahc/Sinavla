@@ -1,6 +1,5 @@
 package com.example.lgsapp.ui.home
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,14 +11,14 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.lgsapp.data.UserPrefs
 import com.example.lgsapp.ui.exams.ExamsScreen
 import kotlinx.coroutines.delay
 import java.time.Duration
@@ -28,14 +27,10 @@ import java.time.Month
 
 @Composable
 fun LgsHomeScreen(
+    targetSchool: String = "",
+    targetScore: String = "",
     onNavigateToOnboarding: () -> Unit = {}
 ) {
-    val context = LocalContext.current
-    val userPrefs = remember { UserPrefs(context) }
-    
-    val targetSchool = userPrefs.getTargetSchool()
-    val targetScore = userPrefs.getTargetScore()
-
     var selectedTab by remember { mutableIntStateOf(0) }
 
     Scaffold(
@@ -355,7 +350,6 @@ private data class TimeLeft(
 
 private fun calculateTimeLeft(): TimeLeft {
     val now = LocalDateTime.now()
-    // LGS Tarihi sabiti doğrudan yerel tarih nesnesi olarak ayarlandı
     val examDate = LocalDateTime.of(2025, Month.JUNE, 15, 9, 30)
 
     if (now.isAfter(examDate)) {
