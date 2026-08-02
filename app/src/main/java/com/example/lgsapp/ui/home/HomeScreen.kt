@@ -1,6 +1,7 @@
 package com.example.lgsapp.ui.home
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -14,7 +15,7 @@ import com.example.lgsapp.ui.exams.ExamsScreen
 
 @Composable
 fun HomeScreen() {
-    var selectedItem by remember { mutableStateOf(0) }
+    var selectedItem by remember { mutableIntStateOf(0) }
     val items = listOf("Ana Sayfa", "Denemeler", "Profil")
     val icons = listOf(Icons.Default.Home, Icons.Default.List, Icons.Default.Person)
 
@@ -32,7 +33,11 @@ fun HomeScreen() {
             }
         }
     ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
             when (selectedItem) {
                 0 -> HomeDashboardContent()
                 1 -> ExamsScreen()
@@ -44,10 +49,12 @@ fun HomeScreen() {
 
 @Composable
 fun HomeDashboardContent() {
+    // Mevcut Ana Sayfa / Sayaç bileşeniniz buraya gelir
     Text(text = "Ana Sayfa / Sayaç Ekranı", modifier = Modifier.padding(16.dp))
 }
 
 @Composable
 fun ProfileContent() {
+    // Mevcut Profil bileşeniniz buraya gelir
     Text(text = "Profil / Ayarlar Ekranı", modifier = Modifier.padding(16.dp))
 }
