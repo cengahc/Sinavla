@@ -1,5 +1,6 @@
 package com.example.lgsapp.ui.home
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -8,6 +9,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.example.lgsapp.ui.exams.ExamsScreen
 
 @Composable
@@ -33,7 +35,7 @@ fun HomeScreen() {
         Box(modifier = Modifier.padding(paddingValues)) {
             when (selectedItem) {
                 0 -> HomeDashboardContent()
-                1 -> ExamsScreen() // Denemeler Sekmesine Geçiş
+                1 -> ExamsScreen()
                 2 -> ProfileContent()
             }
         }
