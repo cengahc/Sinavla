@@ -1,6 +1,7 @@
 package com.example.lgsapp.ui.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
@@ -10,7 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +24,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import kotlin.math.ceil
 
 // ----------------------------------------------------------------
 // Renk Paleti
@@ -45,7 +51,16 @@ object LgsColors {
 // Ana Sayfa
 // ----------------------------------------------------------------
 @Composable
-fun LgsHomeScreen() {
+fun LgsHomeScreen(
+    userName: String,
+    examName: String,
+    examDateMillis: Long,
+    onEditProfile: () -> Unit = {}
+) {
+    val greeting = remember { currentGreeting() }
+    val dateText = remember { currentDateText() }
+    val daysLeft = remember(examDateMillis) { daysUntil(examDateMillis) }
+
     Scaffold(
         containerColor = LgsColors.Background,
         bottomBar = { LgsBottomBar() }
@@ -59,8 +74,13 @@ fun LgsHomeScreen() {
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             Spacer(Modifier.height(8.dp))
-            GreetingHeader(userName = "Elif", dateText = "24 Mart, Pazartesi")
-            CountdownCard(examName = "LGS 2026", daysLeft = 87)
+            GreetingHeader(
+                userName = userName,
+                greeting = greeting,
+                dateText = dateText,
+                onProfileClick = onEditProfile
+            )
+            CountdownCard(examName = examName, daysLeft = daysLeft)
             ContinueTestCard(
                 subjectName = "Fen Bilimleri Deneme 12",
                 percentComplete = 65
@@ -70,6 +90,42 @@ fun LgsHomeScreen() {
             Spacer(Modifier.height(12.dp))
         }
     }
+}
+
+// Saate göre selamlama: 05-11 Günaydın, 12-17 İyi günler, 18-22 İyi akşamlar, 23-04 İyi geceler
+private fun currentGreeting(): String {
+    val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+    return when (hour) {
+        in 5..11 -> "Günaydın"
+        in 12..17 -> "İyi günler"
+        in 18..22 -> "İyi akşamlar"
+        else -> "İyi geceler"
+    }
+}
+
+private fun currentDateText(): String {
+    val formatter = SimpleDateFormat("d MMMM, EEEE", Locale("tr"))
+    return formatter.format(Date())
+}
+
+// Bugünden sınav tarihine kalan gün sayısı (en az 0)
+private fun daysUntil(targetMillis: Long): Int {
+    val now = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
+    val target = Calendar.getInstance().apply {
+        timeInMillis = targetMillis
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
+    val diffMillis = target.timeInMillis - now.timeInMillis
+    val days = ceil(diffMillis / (1000.0 * 60 * 60 * 24)).toInt()
+    return if (days < 0) 0 else days
 }
 
 // Basit bir scroll uzantısı (gerçek projede Modifier.verticalScroll(rememberScrollState()) kullanın)
@@ -83,7 +139,12 @@ private fun Modifier.verticalScrollWorkaround(): Modifier {
 // Üst Karşılama Alanı
 // ----------------------------------------------------------------
 @Composable
-fun GreetingHeader(userName: String, dateText: String) {
+fun GreetingHeader(
+    userName: String,
+    greeting: String,
+    dateText: String,
+    onProfileClick: () -> Unit = {}
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -97,7 +158,7 @@ fun GreetingHeader(userName: String, dateText: String) {
             )
             Spacer(Modifier.height(2.dp))
             Text(
-                text = "Günaydın, $userName! 👋",
+                text = "$greeting, $userName! 👋",
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = FontFamily.Serif,
@@ -121,17 +182,18 @@ fun GreetingHeader(userName: String, dateText: String) {
                 )
             }
             Spacer(Modifier.width(8.dp))
-            // Genişlet / profil butonu
+            // Profil / bilgileri düzenle butonu
             Box(
                 modifier = Modifier
                     .size(56.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF8A8A8A).copy(alpha = 0.6f)),
+                    .background(Color(0xFF8A8A8A).copy(alpha = 0.6f))
+                    .clickable { onProfileClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.OpenInFull,
-                    contentDescription = "Genişlet",
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Bilgilerimi düzenle",
                     tint = Color.White
                 )
             }
@@ -547,7 +609,14 @@ fun LgsBottomBar() {
 @Preview(showBackground = true, widthDp = 380, heightDp = 850)
 @Composable
 fun LgsHomeScreenPreview() {
+    val exampleExamDate = remember {
+        Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 87) }.timeInMillis
+    }
     MaterialTheme {
-        LgsHomeScreen()
+        LgsHomeScreen(
+            userName = "Elif",
+            examName = "LGS",
+            examDateMillis = exampleExamDate
+        )
     }
 }
