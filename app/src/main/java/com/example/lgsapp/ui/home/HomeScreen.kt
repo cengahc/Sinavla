@@ -1,6 +1,8 @@
 package com.example.lgsapp.ui.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -73,8 +75,8 @@ fun LgsHomeScreen() {
 // Basit bir scroll uzantısı (gerçek projede Modifier.verticalScroll(rememberScrollState()) kullanın)
 @Composable
 private fun Modifier.verticalScrollWorkaround(): Modifier {
-    val scrollState = androidx.compose.foundation.rememberScrollState()
-    return this.then(androidx.compose.foundation.verticalScroll(scrollState))
+    val scrollState = rememberScrollState()
+    return this.verticalScroll(scrollState)
 }
 
 // ----------------------------------------------------------------
@@ -513,7 +515,7 @@ fun LgsBottomBar() {
         NavigationBarItem(
             selected = false,
             onClick = { /* TODO */ },
-            icon = { Icon(Icons.AutoMirrored.Outlined.Assignment, contentDescription = null) },
+            icon = { Icon(Icons.Outlined.Assignment, contentDescription = null) },
             label = { Text("Denemeler") },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = LgsColors.NavyDark,
