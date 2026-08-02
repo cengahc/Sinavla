@@ -25,21 +25,20 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    var isOnboardingCompleted by remember { 
-                        mutableStateOf(userPrefs.isOnboardingCompleted) 
+                    var isCompleted by remember { 
+                        mutableStateOf(userPrefs.isCompleted()) 
                     }
 
-                    if (isOnboardingCompleted) {
+                    if (isCompleted) {
                         LgsHomeScreen(
                             onNavigateToOnboarding = {
-                                isOnboardingCompleted = false
+                                isCompleted = false
                             }
                         )
                     } else {
                         OnboardingScreen(
-                            onOnboardingFinished = {
-                                userPrefs.isOnboardingCompleted = true
-                                isOnboardingCompleted = true
+                            onSave = { _, _, _ ->
+                                isCompleted = true
                             }
                         )
                     }

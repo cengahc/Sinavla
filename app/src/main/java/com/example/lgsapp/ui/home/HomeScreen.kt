@@ -15,17 +15,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.lgsapp.data.UserPrefs
 import com.example.lgsapp.ui.exams.ExamsScreen
-import com.example.lgsapp.util.ExamDates
 import kotlinx.coroutines.delay
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.Month
 
 @Composable
 fun LgsHomeScreen(
@@ -33,8 +32,9 @@ fun LgsHomeScreen(
 ) {
     val context = LocalContext.current
     val userPrefs = remember { UserPrefs(context) }
-    val targetSchool = userPrefs.targetSchool
-    val targetScore = userPrefs.targetScore
+    
+    val targetSchool = userPrefs.getTargetSchool()
+    val targetScore = userPrefs.getTargetScore()
 
     var selectedTab by remember { mutableIntStateOf(0) }
 
@@ -105,7 +105,6 @@ private fun MainHomeContent(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Hedef Kartı
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -113,9 +112,7 @@ private fun MainHomeContent(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
+                Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = "Hedefin",
                         fontSize = 14.sp,
@@ -138,7 +135,6 @@ private fun MainHomeContent(
             }
         }
 
-        // Geri Sayım Sayacı
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -158,7 +154,7 @@ private fun MainHomeContent(
                             tint = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            text = "LGS 2025'e Kalan Süre",
+                            text = "LGS'ye Kalan Süre",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -179,7 +175,6 @@ private fun MainHomeContent(
             }
         }
 
-        // İlerleme Özeti
         item {
             Text(
                 text = "Günlük İlerleme",
@@ -208,7 +203,6 @@ private fun MainHomeContent(
             }
         }
 
-        // Ders İlerlemeleri
         item {
             Text(
                 text = "Ders İlerlemeleri",
@@ -217,15 +211,9 @@ private fun MainHomeContent(
             )
         }
 
-        item {
-            SubjectProgressCard("Matematik", 0.65f, "13/20 Konu Tamamlandı")
-        }
-        item {
-            SubjectProgressCard("Fen Bilimleri", 0.80f, "16/20 Konu Tamamlandı")
-        }
-        item {
-            SubjectProgressCard("Türkçe", 0.75f, "15/20 Konu Tamamlandı")
-        }
+        item { SubjectProgressCard("Matematik", 0.65f, "13/20 Konu Tamamlandı") }
+        item { SubjectProgressCard("Fen Bilimleri", 0.80f, "16/20 Konu Tamamlandı") }
+        item { SubjectProgressCard("Türkçe", 0.75f, "15/20 Konu Tamamlandı") }
     }
 }
 
@@ -367,7 +355,8 @@ private data class TimeLeft(
 
 private fun calculateTimeLeft(): TimeLeft {
     val now = LocalDateTime.now()
-    val examDate = ExamDates.LGS_2025
+    // LGS Tarihi sabiti doğrudan yerel tarih nesnesi olarak ayarlandı
+    val examDate = LocalDateTime.of(2025, Month.JUNE, 15, 9, 30)
 
     if (now.isAfter(examDate)) {
         return TimeLeft(0, 0, 0, 0)
